@@ -1,0 +1,36 @@
+name: my_wallet
+description: "Finansal takip uygulaması - Kur ve birikim yönetimi"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Yerel Veri Saklama
+  shared_preferences: ^2.2.2
+
+  # HTTP İstekleri
+  http: ^1.1.2
+  
+  # XML Parsing (TCMB için)
+  xml: ^6.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Uygulama ikonu ve splash screen için gerekli olabilir
+  # assets:
+  #   - images/
+  #   - icons/
