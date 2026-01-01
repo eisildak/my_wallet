@@ -100,34 +100,6 @@ class ApiService {
     }
   }
 
-  /// Döviz kuru parse et (USD veya EUR)
-  Map<String, double>? _parseCurrency(String html, String code) {
-    try {
-      // Örnek: | USD | 43,060 | 43,202 | %0.00 |
-      final pattern = RegExp(
-        r'\|\s*' + code + r'\s*\|\s*([\d.,]+)\s*\|\s*([\d.,]+)',
-        caseSensitive: false,
-      );
-      
-      final match = pattern.firstMatch(html);
-      
-      if (match != null) {
-        // Türkçe sayı formatını parse et (43,060 -> 43.060)
-        final buyStr = match.group(1)!.replaceAll(',', '.');
-        final sellStr = match.group(2)!.replaceAll(',', '.');
-        
-        return {
-          'buy': double.parse(buyStr),
-          'sell': double.parse(sellStr),
-        };
-      }
-      return null;
-    } catch (e) {
-      print('$code parse hatası: $e');
-      return null;
-    }
-  }
-
   /// Altın fiyatını parse et (Gram 24 Ayar)
   Map<String, double>? _parseGold(String html) {
     try {
