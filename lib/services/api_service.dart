@@ -8,6 +8,9 @@ import '../models/currency_model.dart';
 class ApiService {
   /// TCMB (Türkiye Cumhuriyet Merkez Bankası) XML API
   static const String _tcmbUrl = 'https://www.tcmb.gov.tr/kurlar/today.xml';
+  
+  /// Altınkaynak - Altın fiyatları
+  static const String _goldUrl = 'https://www.altinkaynak.com/canli-kurlar/altin';
 
   /// Güncel döviz kurlarını TCMB'den getir
   Future<List<CurrencyModel>> getCurrencies() async {
@@ -47,13 +50,13 @@ class ApiService {
           sellPrice: eurSell,
         ));
 
-        // Altın fiyatı (TCMB'de altın yok, sabit değer kullanıyoruz)
-        // Gerçek altın fiyatı için ayrı bir API kullanılabilir
+        // Altın fiyatı - Altınkaynak'tan çek
+        final goldPrices = await _getGoldPrice();
         currencies.add(CurrencyModel(
-          name: 'Altın (Gram)',
+          name: 'Altın (Gram 24 Ayar)',
           code: 'GOLD',
-          buyPrice: 2847.50,
-          sellPrice: 2858.20,
+          buyPrice: goldPrices['buy']!,
+          sellPrice: goldPrices['sell']!,
         ));
 
         return currencies;
@@ -64,6 +67,48 @@ class ApiService {
       // Hata durumunda mock data döndür
       print('API Hatası: $e - Mock data kullanılıyor');
       return _getMockCurrencies();
+    }
+  }
+
+  /// Altınkaynak'tan gram altın fiyatlarını çek
+  Future<Map<String, double>> _getGoldPrice() async {
+    try {
+      final response = await http.get(
+        Uri.parse(_goldUrl),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final html = response.body;
+        
+        // HTML'den "Gram (24 Ayar)" satırını bul
+        // Örnek: | Gram (24 Ayar) | 6.143,66 | 6.269,62 | %0.19 |
+        final gramPattern = RegExp(
+          r'Gram\s*\(24\s*Ayar\)\s*[|]\s*([\d.,]+)\s*[|]\s*([\d.,]+)',
+          caseSensitive: false,
+        );
+        
+        final match = gramPattern.firstMatch(html);
+        
+        if (match != null) {
+          // Türkçe sayı formatını parse et (6.143,66 -> 6143.66)
+          final buyStr = match.group(1)!.replaceAll('.', '').replaceAll(',', '.');
+          final sellStr = match.group(2)!.replaceAll('.', '').replaceAll(',', '.');
+          
+          return {
+            'buy': double.parse(buyStr),
+            'sell': double.parse(sellStr),
+          };
+        }
+      }
+      
+      // Parse edilemezse varsayılan değer döndür
+      throw Exception('Altın fiyatı parse edilemedi');
+    } catch (e) {
+      print('Altın fiyatı çekilemedi: $e - Varsayılan değer kullanılıyor');
+      return {'buy': 6143.66, 'sell': 6269.62};
     }
   }
 
@@ -83,10 +128,10 @@ class ApiService {
         sellPrice: 35.96,
       ),
       CurrencyModel(
-        name: 'Altın (Gram)',
+        name: 'Altın (Gram 24 Ayar)',
         code: 'GOLD',
-        buyPrice: 2847.50,
-        sellPrice: 2858.20,
+        buyPrice: 6143.66,
+        sellPrice: 6269.62,
       ),
     ];
   }
