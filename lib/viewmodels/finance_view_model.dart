@@ -27,7 +27,13 @@ class FinanceViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _currencies = await _apiService.getCurrencies();
+      final result = await _apiService.getCurrencies();
+      if (result != null) {
+        _currencies = result;
+        _errorMessage = null;
+      } else {
+        _errorMessage = 'Kur verileri yüklenemedi. Lütfen daha sonra tekrar deneyin.';
+      }
       _isLoading = false;
       notifyListeners();
     } catch (e) {
