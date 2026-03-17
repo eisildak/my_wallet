@@ -526,6 +526,65 @@ Future<void> fetchData() async {
 
 ---
 
+## 📚 DERS 11: Cihaz Hafızası (SharedPreferences) ve Açılış Ekranları (Onboarding)
+
+### İncelenmesi Gereken Dosyalar
+- `lib/viewmodels/onboarding_view_model.dart` - SharedPreferences ile veri kaydetme ve okuma
+- `lib/views/splash_view.dart` - Uygulama açılış (routing) mantığı
+- `lib/views/onboarding_view.dart` - İlk gösterilen bilgilendirme ekranı
+
+### Neden SharedPreferences Kullanılır?
+Uygulamayı kapatıp açtığınızda gitmesini istemediğiniz **küçük verileri** (örn: "Karanlık mod açık mı?", "Kullanıcı Onboarding ekranını gördü mü?", "Hangi dil seçili?") telefonun yerel hafızasında tutmak için kullanılır.
+
+```dart
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Veri Kaydetme (Yazma)
+final prefs = await SharedPreferences.getInstance();
+await prefs.setBool('hasSeenOnboarding', true); // Boolean veri kaydettik
+
+// Veri Okuma
+final prefs = await SharedPreferences.getInstance();
+bool gorulduMu = prefs.getBool('hasSeenOnboarding') ?? false; // Eğer daha önce kaydedilmemişse (null ise) false döndürür.
+```
+
+### Yönlendirme Mantığı (Splash Screen)
+Uygulama açılırken hangi sayfaya gideceğine karar vermek için veriler okunur. `SplashView` içinde bu kontrol yapılıp `Navigator.pushReplacement` ile kullanıcı ilgili ekrana atılır.
+
+### Pratik Görevler
+1. `splash_view.dart` dosyasını açıp içindeki `if/else` yönlendirmesini inceleyin.
+2. `OnboardingViewModel` içindeki SharedPreferences kaydetme satırlarını okuyun.
+
+---
+
+## 📚 DERS 12: Çoklu Dil Desteği (Localization / L10n)
+
+### İncelenmesi Gereken Dosyalar
+- `lib/l10n/app_en.arb`, `app_tr.arb` vb. - Çeviri kelimelerinin tutulduğu sözlük dosyaları
+- `lib/viewmodels/locale_view_model.dart` - Anlık olarak uygulama dilini değiştiren yönetici sınıf
+- `pubspec.yaml` (flutter_localizations)
+
+### Nasıl Çalışır?
+Flutter'da metinleri koda doğrudan "Merhaba" diye yazmak yerine, projenin `.arb` uzantılı çeviri dosyalarına koyarız. Flutter bu dosyaları derler ve bize `AppLocalizations.of(context)!.merhaba` şeklinde bir kullanım sunar. Kullanıcı dili değiştiğinde arayüz otomatik güncellenir.
+
+```dart
+// app_tr.arb içinde: "hello": "Merhaba Flutter"
+// app_en.arb içinde: "hello": "Hello Flutter"
+
+// Ekranda Kullanımı:
+Text(AppLocalizations.of(context)!.hello) // Seçili dile göre Merhaba veya Hello yazar.
+```
+
+### Anlık Dil Değişimi
+`LocaleViewModel` içinde `ChangeNotifier` kullanılır. Dil kodu ("en", "tr") güncellenince `notifyListeners()` çağrılır, `main.dart` içindeki `MaterialApp` widget'ındaki `locale` özelliği yenilendiği için uygulamanın her yerindeki kelimeler bir anda çevrilir.
+
+### Pratik Görevler
+1. `lib/l10n/` klasörüne gidip yeni kelimeler (key) ekleyin.
+2. Ekranda bu kelimeleri `AppLocalizations.of(context)!.yeniKelime` diyerek ekrana yazdırın.
+3. `DashboardView` içindeki dil değiştirme `PopupMenuButton` ikonunu inceleyin.
+
+---
+
 ## 🎓 FİNAL PROJESİ ÖNERİSİ
 
 Öğrendiklerinizi pekiştirmek için bu projeyi yapın:

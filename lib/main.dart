@@ -22,7 +22,8 @@ class MyWalletApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Provider ile ViewModelleri uygulamaya enjekte ediyoruz
+    // Öğrenciler İçin Not: Provider ile uygulamanın her yerinden erişilebilecek ortak verileri/state'leri dinliyoruz.
+    // MultiProvider birden fazla viewModel'i tek seferde uygulamaya enjekte eder.
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthViewModel()),
@@ -30,8 +31,10 @@ class MyWalletApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleViewModel()),
         ChangeNotifierProvider(create: (_) => OnboardingViewModel()),
       ],
+      // Consumer: LocaleViewModel değiştikçe (kullanıcı dil değiştirdikçe) sadece burayı (MaterialApp'i) tetikler.
       child: Consumer<LocaleViewModel>(
         builder: (context, localeViewModel, child) {
+          // Dil yüklenirken boş bir yükleniyor ekranı döndür.
           if (localeViewModel.isLoading) {
              return const MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
           }

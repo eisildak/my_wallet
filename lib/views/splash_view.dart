@@ -6,6 +6,9 @@ import 'login_view.dart';
 import 'dashboard_view.dart';
 import 'onboarding_view.dart';
 
+/// Öğrenciler İçin Not:
+/// SplashView, uygulama ilk açıldığında ekranda görünen ve "yönlendirici" görevi gören sayfadır.
+/// Kullanıcının nereye gideceğine (Onboarding, Login veya Dashboard) burada karar verilir.
 class SplashView extends StatefulWidget {
   const SplashView({Key? key}) : super(key: key);
 
@@ -21,28 +24,34 @@ class _SplashViewState extends State<SplashView> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    // Biraz bekleme süresi ekleyerek splash screen'in görünmesini sağlayabiliriz
+    // Öğrenciler İçin Not: Logoyu en az 2 saniye ekranda göstermek için yapay bir gecikme (delay) eklendi.
+    // await: Bu kodun bitmesini bekle demek. Bitmeden alttaki satıra geçmez.
     await Future.delayed(const Duration(seconds: 2));
 
+    // widget ağacında hala aktif mi kontrolü. Eğer sayfa kapanmışsa işlemi kes.
     if (!mounted) return;
 
+    // Provider (Consumer) ile önceden yüklenmiş durum yöneticilerini (ViewModel) okuyoruz.
+    // Burada "listen: false" (read) kullandık çünkü state değişimi bizim UI'ımızı burada tetiklemesin, sadece okuyup karar verelim diye.
     final onboardingViewModel = context.read<OnboardingViewModel>();
     final authViewModel = context.read<AuthViewModel>();
 
-    // Eğer veri yükleniyorsa biraz daha bekle (Onboarding veya Auth state)
-    // Gerçekte bunlar main.dart yüklenirken zaten memory'e alınmış olur ama
-    // isLoading döngüleri asenkron tamamlanabilir.
-    
-    // Yönlendirme mantığı:
+    // Öğrenciler İçin Not: YÖNLENDİRME (ROUTING) MANTIĞI
+    // 1. Kullanıcı uygulamayı İLK DEFA mı açıyor? (SharedPreferences'da kayıtlı değilse false döner)
     if (!onboardingViewModel.hasSeenOnboarding) {
+      // pushReplacement: Geri dönülemeyecek şekilde yeni sayfaya geç. Çünkü Splash'e geri dönmemeli.
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const OnboardingView()),
       );
-    } else if (authViewModel.currentUser != null) {
+    } 
+    // 2. Kullanıcı önceden giriş yapmış mı?
+    else if (authViewModel.currentUser != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const DashboardView()),
       );
-    } else {
+    } 
+    // 3. Kullanıcı giriş yapmamışsa mecbur giriş ekranına yolla.
+    else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginView()),
       );

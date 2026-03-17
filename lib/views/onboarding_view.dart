@@ -18,12 +18,15 @@ class OnboardingView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
+          // Öğrenciler İçin Not: Consumer widget'ı sayesinde sadece bu PopupMenuButton dil değiştiğinde yeniden çizilir.
           Consumer<LocaleViewModel>(
             builder: (context, localeViewModel, child) {
               return PopupMenuButton<String>(
                 icon: Icon(Icons.language, color: Colors.blue[700]),
                 tooltip: 'Select Language',
+                // Kullanıcı listeden bir dil seçtiği zaman tetiklenen blok
                 onSelected: (String languageCode) {
+                  // Seçilen dili (languageCode: "en" veya "tr" gibi) ViewModel'e iletiyoruz.
                   localeViewModel.setLocale(Locale(languageCode));
                 },
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -86,9 +89,13 @@ class OnboardingView extends StatelessWidget {
                   ],
                 ),
               ),
+              // Öğrenciler İçin Not: "Hemen Başla" butonu. Tıklandığında önce LocalStorage (SharedPreferences)'a "görüldü" olarak kaydederiz.
               ElevatedButton(
                 onPressed: () async {
+                  // OnboardingViewModel içindeki completeOnboarding() metodunu çağırıp kayıt atıyoruz.
                   await context.read<OnboardingViewModel>().completeOnboarding();
+                  
+                  // İşlem bittikten sonra UI kapatılmamışsa LoginView'a (Giriş) yönlendiriyoruz.
                   if (!context.mounted) return;
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (_) => const LoginView()),
