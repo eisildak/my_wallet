@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/auth_view_model.dart';
+import '../viewmodels/locale_view_model.dart';
+import 'package:my_wallet/l10n/app_localizations.dart';
 import 'register_view.dart';
 import 'dashboard_view.dart';
 
@@ -47,26 +49,62 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Consumer<LocaleViewModel>(
+            builder: (context, localeViewModel, child) {
+              return PopupMenuButton<String>(
+                icon: Icon(Icons.language, color: Colors.blue[700]),
+                tooltip: 'Select Language',
+                onSelected: (String languageCode) {
+                  localeViewModel.setLocale(Locale(languageCode));
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'en',
+                    child: Text('English (EN)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'tr',
+                    child: Text('Türkçe (TR)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'de',
+                    child: Text('Deutsch (DE)'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Consumer<AuthViewModel>(
               builder: (context, authViewModel, child) {
-                return Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Logo veya Başlık
-                      Icon(
-                        Icons.account_balance_wallet,
-                        size: 80,
-                        color: Colors.blue[700],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Finansal Takip',
+                      final l10n = AppLocalizations.of(context)!;
+                      return Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Logo veya Başlık
+                            Image.asset(
+                              'assets/icons/app_icon_transparent.png',
+                              height: 80,
+                              errorBuilder: (context, error, stackTrace) => Icon(
+                                Icons.account_balance_wallet,
+                                size: 80,
+                                color: Colors.blue[700],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.appTitle,
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -80,7 +118,7 @@ class _LoginViewState extends State<LoginView> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'E-posta',
+                          labelText: l10n.email,
                           prefixIcon: const Icon(Icons.email),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -90,10 +128,10 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'E-posta adresi gerekli';
+                            return l10n.emailRequired;
                           }
                           if (!value.contains('@')) {
-                            return 'Geçerli bir e-posta girin';
+                            return l10n.emailInvalid;
                           }
                           return null;
                         },
@@ -105,7 +143,7 @@ class _LoginViewState extends State<LoginView> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Şifre',
+                          labelText: l10n.password,
                           prefixIcon: const Icon(Icons.lock),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -115,10 +153,10 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Şifre gerekli';
+                            return l10n.passwordRequired;
                           }
                           if (value.length < 6) {
-                            return 'Şifre en az 6 karakter olmalı';
+                            return l10n.passwordLengthError;
                           }
                           return null;
                         },
@@ -154,9 +192,9 @@ class _LoginViewState extends State<LoginView> {
                           ),
                           child: authViewModel.isLoading
                               ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'Giriş Yap',
-                                  style: TextStyle(
+                              : Text(
+                                  l10n.login,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -170,7 +208,7 @@ class _LoginViewState extends State<LoginView> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Hesabınız yok mu?'),
+                          Text(l10n.noAccount),
                           TextButton(
                             onPressed: () {
                               Navigator.of(context).push(
@@ -179,7 +217,7 @@ class _LoginViewState extends State<LoginView> {
                                 ),
                               );
                             },
-                            child: const Text('Kayıt Ol'),
+                            child: Text(l10n.register),
                           ),
                         ],
                       ),

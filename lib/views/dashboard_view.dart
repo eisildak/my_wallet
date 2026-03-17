@@ -2,8 +2,10 @@
 /// lib/views/dashboard_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_wallet/l10n/app_localizations.dart';
 import '../viewmodels/finance_view_model.dart';
 import '../viewmodels/auth_view_model.dart';
+import '../viewmodels/locale_view_model.dart';
 import 'login_view.dart';
 
 class DashboardView extends StatefulWidget {
@@ -49,8 +51,9 @@ class _DashboardViewState extends State<DashboardView> {
     showDialog(
       context: context,
       builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
-          title: const Text('Birikim Ekle'),
+          title: Text(l10n.mySavings),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -58,27 +61,27 @@ class _DashboardViewState extends State<DashboardView> {
                 TextField(
                   controller: _usdController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Dolar Miktarı',
-                    prefixIcon: Icon(Icons.attach_money),
+                  decoration: InputDecoration(
+                    labelText: l10n.usdAmount,
+                    prefixIcon: const Icon(Icons.attach_money),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _eurController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Euro Miktarı',
-                    prefixIcon: Icon(Icons.euro),
+                  decoration: InputDecoration(
+                    labelText: l10n.eurAmount,
+                    prefixIcon: const Icon(Icons.euro),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _goldController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Altın (Gram)',
-                    prefixIcon: Icon(Icons.diamond),
+                  decoration: InputDecoration(
+                    labelText: l10n.goldGram,
+                    prefixIcon: const Icon(Icons.diamond),
                   ),
                 ),
               ],
@@ -87,7 +90,7 @@ class _DashboardViewState extends State<DashboardView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('İptal'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -117,12 +120,12 @@ class _DashboardViewState extends State<DashboardView> {
                     Navigator.pop(context);
                     
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Birikim başarıyla eklendi!')),
+                      SnackBar(content: Text(l10n.savingAddedSuccess)),
                     );
                   }
                 }
               },
-              child: const Text('Kaydet'),
+              child: Text(l10n.save),
             ),
           ],
         );
@@ -143,17 +146,53 @@ class _DashboardViewState extends State<DashboardView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Finansal Takip'),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/icons/app_icon_transparent.png',
+              height: 32,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_balance_wallet, color: Colors.white),
+            ),
+            const SizedBox(width: 12),
+            Text(l10n.appTitle),
+          ],
+        ),
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
         actions: [
+          Consumer<LocaleViewModel>(
+            builder: (context, localeViewModel, child) {
+              return PopupMenuButton<String>(
+                icon: const Icon(Icons.language),
+                tooltip: 'Select Language',
+                onSelected: (String languageCode) {
+                  localeViewModel.setLocale(Locale(languageCode));
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'en',
+                    child: Text('English (EN)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'tr',
+                    child: Text('Türkçe (TR)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'de',
+                    child: Text('Deutsch (DE)'),
+                  ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _handleLogout,
-            tooltip: 'Çıkış Yap',
+            tooltip: l10n.logout,
           ),
         ],
       ),
@@ -191,7 +230,7 @@ class _DashboardViewState extends State<DashboardView> {
                             builder: (context, authViewModel, child) {
                               final username = authViewModel.currentUser?['username'] ?? 'Kullanıcı';
                               return Text(
-                                'Hoş geldin, $username',
+                                l10n.welcomeMessage(username),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -206,9 +245,9 @@ class _DashboardViewState extends State<DashboardView> {
                   const SizedBox(height: 24),
 
                   // Güncel Kurlar Başlığı
-                  const Text(
-                    'Güncel Kurlar',
-                    style: TextStyle(
+                  Text(
+                    l10n.currentRates,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -262,7 +301,7 @@ class _DashboardViewState extends State<DashboardView> {
                               ),
                             ),
                             Text(
-                              'Satış: ${currency.sellPrice.toStringAsFixed(2)} ₺',
+                              '${l10n.sell}: ${currency.sellPrice.toStringAsFixed(2)} ₺',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -280,9 +319,9 @@ class _DashboardViewState extends State<DashboardView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Birikimlerim',
-                        style: TextStyle(
+                      Text(
+                        l10n.mySavings,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -290,7 +329,7 @@ class _DashboardViewState extends State<DashboardView> {
                       ElevatedButton.icon(
                         onPressed: _showAddBalanceDialog,
                         icon: const Icon(Icons.add),
-                        label: const Text('Ekle'),
+                        label: Text(l10n.add),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue[700],
                           foregroundColor: Colors.white,
@@ -331,9 +370,9 @@ class _DashboardViewState extends State<DashboardView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Toplam Varlık Değeri',
-                              style: TextStyle(
+                            Text(
+                              l10n.totalAssetValue,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -352,11 +391,11 @@ class _DashboardViewState extends State<DashboardView> {
                       ),
                     ),
                   ] else
-                    const Card(
+                    Card(
                       child: Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Center(
-                          child: Text('Henüz birikim eklemediniz.'),
+                          child: Text(l10n.noSavingsAdded),
                         ),
                       ),
                     ),

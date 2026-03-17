@@ -1,0 +1,45 @@
+{
+  "@@locale": "en",
+  "appTitle": "Financial Tracker",
+  "email": "Email",
+  "password": "Password",
+  "emailRequired": "Email address is required",
+  "emailInvalid": "Enter a valid email",
+  "passwordRequired": "Password is required",
+  "passwordLengthError": "Password must be at least 6 characters",
+  "login": "Login",
+  "noAccount": "Don't have an account?",
+  "register": "Register",
+  "createAccount": "Create New Account",
+  "username": "Username",
+  "usernameRequired": "Username is required",
+  "usernameLengthError": "Username must be at least 3 characters",
+  "passwordConfirm": "Confirm Password",
+  "passwordConfirmRequired": "Password confirmation is required",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "welcomeMessage": "Welcome, {username}",
+  "@welcomeMessage": {
+    "placeholders": {
+      "username": {
+        "type": "String",
+        "example": "John"
+      }
+    }
+  },
+  "currentRates": "Current Rates",
+  "sell": "Sell",
+  "mySavings": "My Savings",
+  "add": "Add",
+  "usdAmount": "USD Amount",
+  "eurAmount": "EUR Amount",
+  "goldGram": "Gold (Gram)",
+  "cancel": "Cancel",
+  "save": "Save",
+  "savingAddedSuccess": "Savings added successfully!",
+  "logout": "Logout",
+  "totalAssetValue": "Total Asset Value",
+  "noSavingsAdded": "You haven't added any savings yet.",
+  "onboardingTitle": "Take Control of Your Finances",
+  "onboardingDescription": "Track your savings, view current exchange rates, and manage your assets all in one place.",
+  "getStarted": "Get Started"
+}

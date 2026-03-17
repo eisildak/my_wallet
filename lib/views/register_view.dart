@@ -2,7 +2,9 @@
 /// lib/views/register_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:my_wallet/l10n/app_localizations.dart';
 import '../viewmodels/auth_view_model.dart';
+import '../viewmodels/locale_view_model.dart';
 import 'dashboard_view.dart';
 
 class RegisterView extends StatefulWidget {
@@ -55,6 +57,33 @@ class _RegisterViewState extends State<RegisterView> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.blue[700]),
+        actions: [
+          Consumer<LocaleViewModel>(
+            builder: (context, localeViewModel, child) {
+              return PopupMenuButton<String>(
+                icon: Icon(Icons.language, color: Colors.blue[700]),
+                tooltip: 'Select Language',
+                onSelected: (String languageCode) {
+                  localeViewModel.setLocale(Locale(languageCode));
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'en',
+                    child: Text('English (EN)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'tr',
+                    child: Text('Türkçe (TR)'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'de',
+                    child: Text('Deutsch (DE)'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Center(
@@ -62,20 +91,25 @@ class _RegisterViewState extends State<RegisterView> {
             padding: const EdgeInsets.all(24.0),
             child: Consumer<AuthViewModel>(
               builder: (context, authViewModel, child) {
+                final l10n = AppLocalizations.of(context)!;
                 return Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Başlık
-                      Icon(
-                        Icons.person_add,
-                        size: 80,
-                        color: Colors.blue[700],
+                      Image.asset(
+                        'assets/icons/app_icon_transparent.png',
+                        height: 80,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.person_add,
+                          size: 80,
+                          color: Colors.blue[700],
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Yeni Hesap Oluştur',
+                        l10n.createAccount,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -88,7 +122,7 @@ class _RegisterViewState extends State<RegisterView> {
                       TextFormField(
                         controller: _usernameController,
                         decoration: InputDecoration(
-                          labelText: 'Kullanıcı Adı',
+                          labelText: l10n.username,
                           prefixIcon: const Icon(Icons.person),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -98,10 +132,10 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Kullanıcı adı gerekli';
+                            return l10n.usernameRequired;
                           }
                           if (value.length < 3) {
-                            return 'Kullanıcı adı en az 3 karakter olmalı';
+                            return l10n.usernameLengthError;
                           }
                           return null;
                         },
@@ -113,7 +147,7 @@ class _RegisterViewState extends State<RegisterView> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          labelText: 'E-posta',
+                          labelText: l10n.email,
                           prefixIcon: const Icon(Icons.email),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -123,10 +157,10 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'E-posta adresi gerekli';
+                            return l10n.emailRequired;
                           }
                           if (!value.contains('@')) {
-                            return 'Geçerli bir e-posta girin';
+                            return l10n.emailInvalid;
                           }
                           return null;
                         },
@@ -138,7 +172,7 @@ class _RegisterViewState extends State<RegisterView> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Şifre',
+                          labelText: l10n.password,
                           prefixIcon: const Icon(Icons.lock),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -148,10 +182,10 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Şifre gerekli';
+                            return l10n.passwordRequired;
                           }
                           if (value.length < 6) {
-                            return 'Şifre en az 6 karakter olmalı';
+                            return l10n.passwordLengthError;
                           }
                           return null;
                         },
@@ -163,7 +197,7 @@ class _RegisterViewState extends State<RegisterView> {
                         controller: _confirmPasswordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          labelText: 'Şifre Tekrar',
+                          labelText: l10n.passwordConfirm,
                           prefixIcon: const Icon(Icons.lock_outline),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -173,10 +207,10 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Şifre tekrarı gerekli';
+                            return l10n.passwordConfirmRequired;
                           }
                           if (value != _passwordController.text) {
-                            return 'Şifreler eşleşmiyor';
+                            return l10n.passwordsDoNotMatch;
                           }
                           return null;
                         },
@@ -212,9 +246,9 @@ class _RegisterViewState extends State<RegisterView> {
                           ),
                           child: authViewModel.isLoading
                               ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'Kayıt Ol',
-                                  style: TextStyle(
+                              : Text(
+                                  l10n.register,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,

@@ -10,6 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
   # State Management
   provider: ^6.1.1
 
@@ -29,8 +33,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
 
   # Uygulama ikonu ve splash screen için gerekli olabilir
-  # assets:
-  #   - images/
-  #   - icons/
+  assets:
+    - assets/images/
+    - assets/icons/
